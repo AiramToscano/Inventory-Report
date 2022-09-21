@@ -1,6 +1,8 @@
 import csv
 import json
 
+import xmltodict
+
 
 from ..reports.simple_report import SimpleReport
 from ..reports.complete_report import CompleteReport
@@ -16,6 +18,10 @@ class Inventory():
         if (caminhoCerto[1] == 'json'):
             json = Inventory.importjson(caminho, tipodeRelatorio)
             return json
+
+        if (caminhoCerto[1] == 'xml'):
+            xml = Inventory.importxml(caminho, tipodeRelatorio)
+            return xml
 
     def importcsv(caminho, tipodeRelatorio):
         if (tipodeRelatorio == "simples"):
@@ -42,3 +48,15 @@ class Inventory():
             with open(caminho) as file:
                 read = json.load(file)
             return CompleteReport.generate(read)
+
+    def importxml(caminho, tipodeRelatorio):
+        if (tipodeRelatorio == "simples"):
+            with open(caminho, 'r', encoding='utf-8') as file:
+                my_xml = file.read()
+                my_dict = xmltodict.parse(my_xml)
+            return SimpleReport.generate(my_dict['dataset']['record'])
+        if (tipodeRelatorio == "completo"):
+            with open(caminho, 'r', encoding='utf-8') as file:
+                my_xml = file.read()
+                my_dict = xmltodict.parse(my_xml)
+            return CompleteReport.generate(my_dict['dataset']['record'])
